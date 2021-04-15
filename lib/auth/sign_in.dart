@@ -1,14 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/auth/authButton.dart';
+import 'package:flutter_app/services/auth.dart';
 
 import 'customButton.dart';
 
 class SignInPage extends StatelessWidget {
+  const SignInPage({Key key, @required this.onSignIn, @required this.auth})
+      : super(key: key);
+  final void Function(User) onSignIn;
+  final AuthBase auth;
+
   Future<void> _anonymousSignIn() async {
     try {
-      final userCredentials = await FirebaseAuth.instance.signInAnonymously();
-      print(" id is ${userCredentials.user.uid}");
+      final user = await auth.signInAnonymously();
+      onSignIn(user);
     } catch (e) {
       print(e.toString());
     }
@@ -33,7 +39,7 @@ class SignInPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomButton(
-                color: Colors.cyan,
+                color: Colors.brown,
                 text: "Sign in ",
                 onPress: () {},
               ),
