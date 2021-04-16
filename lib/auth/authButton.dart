@@ -5,15 +5,17 @@ import 'customButton.dart';
 class AuthButton extends CustomButton {
   final String image;
   final Color borderColor;
+  final onPress;
 
-  AuthButton({this.image, this.borderColor, color, text, textColor})
+  AuthButton(
+      {this.image, this.borderColor, this.onPress, color, text, textColor})
       : super(color: color, text: text, textColor: textColor);
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPress,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

@@ -16,6 +16,14 @@ class SignInPage extends StatelessWidget {
     }
   }
 
+  Future<void> _googleSignIn() async {
+    try {
+      await auth.signInWithGoogle();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,6 +54,7 @@ class SignInPage extends StatelessWidget {
                 text: "Sign in with google",
                 textColor: Colors.black,
                 borderColor: Color(0XFFDB4437),
+                onPress: _googleSignIn,
               ),
               AuthButton(
                 color: Color(0xff3b5998),
