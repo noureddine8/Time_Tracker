@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/services/auth.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key key, @required this.onSignOut, @required this.auth})
-      : super(key: key);
-  final VoidCallback onSignOut;
+  const Home({Key key, @required this.auth}) : super(key: key);
   final AuthBase auth;
 
   Future<void> _signOut() async {
     try {
       await auth.signOut();
-      onSignOut();
     } catch (e) {
       print(e.toString());
     }
