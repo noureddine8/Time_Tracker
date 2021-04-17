@@ -24,6 +24,14 @@ class SignInPage extends StatelessWidget {
     }
   }
 
+  Future<void> _facebookSignIn() async {
+    try {
+      await auth.signInWithFacebook();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +70,7 @@ class SignInPage extends StatelessWidget {
                 text: "Sign in with facebook",
                 textColor: Colors.white,
                 borderColor: Color(0xff3b5998),
+                onPress: _facebookSignIn,
               ),
               Text(
                 "Or",
