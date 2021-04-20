@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/auth/authButton.dart';
+import 'package:flutter_app/auth/email_sign_in_page.dart';
 import 'package:flutter_app/services/auth.dart';
 
 import 'customButton.dart';
@@ -32,6 +33,13 @@ class SignInPage extends StatelessWidget {
     }
   }
 
+  void onSigninClick(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EmailSigninPage(), fullscreenDialog: true));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +61,7 @@ class SignInPage extends StatelessWidget {
               CustomButton(
                 color: Colors.brown,
                 text: "Sign in ",
-                onPress: () {},
+                onPress: () => onSigninClick(context),
               ),
               SizedBox(height: 50),
               AuthButton(
