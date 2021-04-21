@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/services/auth.dart';
 
 class EmailSigninForm extends StatefulWidget {
+  const EmailSigninForm({Key key, this.auth}) : super(key: key);
+  final AuthBase auth;
+
   @override
   _EmailSigninFormState createState() => _EmailSigninFormState();
 }
@@ -8,12 +12,30 @@ class EmailSigninForm extends StatefulWidget {
 class _EmailSigninFormState extends State<EmailSigninForm> {
   TextEditingController _emailController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
-  void _submit() {
-    print(
-        "Email : ${_emailController.text} and Password : ${_passwordController.text}");
-  }
+  bool _isSignIn = true;
+  bool _isloading = false;
+  String get _email => _emailController.text;
+  String get _password => _passwordController.text;
 
-  var _isSignIn = true;
+  void _submit() async {
+    setState(() {
+      _isloading = true;
+    });
+    try {
+      if (_isSignIn) {
+        await widget.auth.signInWithEmailAndPassword(_email, _password);
+      } else {
+        await widget.auth.signUpWithEmailAndPassword(_email, _password);
+      }
+      Navigator.of(context).pop();
+    } catch (e) {
+      print(e.toString());
+    } finally {
+      setState(() {
+        _isloading = false;
+      });
+    }
+  }
 
   void _toggleFormType() {
     setState(() {
@@ -25,7 +47,7 @@ class _EmailSigninFormState extends State<EmailSigninForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(15.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,29 +62,42 @@ class _EmailSigninFormState extends State<EmailSigninForm> {
     final secondText = _isSignIn
         ? "Need an account? Register"
         : "Already have an account? Sign in";
+    final bool isButtonEnabled =
+        !_isloading && _email.isNotEmpty && _password.isNotEmpty;
+
     return [
       TextField(
         controller: _emailController,
         decoration: InputDecoration(
-          labelText: "Email",
-          hintText: "type your email",
-        ),
+            labelText: "Email",
+            hintText: "type your email",
+            enabled: !_isloading),
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        onChanged: (e) {
+          setState(() {});
+        },
       ),
       TextField(
         controller: _passwordController,
         obscureText: true,
-        decoration: InputDecoration(
-          labelText: "Password",
-        ),
+        decoration:
+            InputDecoration(labelText: "Password", enabled: !_isloading),
+        textInputAction: TextInputAction.done,
+        onChanged: (e) {
+          setState(() {});
+        },
       ),
       Container(
           margin: EdgeInsets.only(top: 10.0),
-          child: ElevatedButton(child: Text(buttonText), onPressed: _submit)),
+          child: ElevatedButton(
+              child: Text(buttonText),
+              onPressed: isButtonEnabled ? _submit : null)),
       Container(
           margin: EdgeInsets.only(top: 10.0),
           child: OutlinedButton(
             child: Text(secondText),
-            onPressed: _toggleFormType,
+            onPressed: _isloading ? null : _toggleFormType,
             style:
                 OutlinedButton.styleFrom(side: BorderSide(color: Colors.white)),
           ))
