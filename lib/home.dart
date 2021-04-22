@@ -13,6 +13,27 @@ class Home extends StatelessWidget {
     }
   }
 
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final bool didRequestSignOut = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+              title: Text("SIGN OUT"),
+              content: Text("Are yo sure you want to sign out?"),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text("NO")),
+                TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text("YES"))
+              ],
+            ));
+    if (didRequestSignOut) {
+      _signOut();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +42,7 @@ class Home extends StatelessWidget {
         centerTitle: true,
         actions: [
           TextButton(
-              onPressed: _signOut,
+              onPressed: () => _confirmSignOut(context),
               child: Text(
                 "Log out",
                 style: TextStyle(
