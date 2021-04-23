@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/auth_provider.dart';
+import 'package:flutter_app/services/auth.dart';
+import 'package:provider/provider.dart';
 
 class EmailSigninForm extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _EmailSigninFormState extends State<EmailSigninForm> {
       _isloading = true;
     });
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context, listen: false);
       if (_isSignIn) {
         await auth.signInWithEmailAndPassword(_email, _password);
       } else {

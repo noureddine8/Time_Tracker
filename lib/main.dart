@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/landing.dart';
 import 'package:flutter_app/services/auth.dart';
-import 'package:flutter_app/services/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -17,36 +17,36 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
+    return Provider<AuthBase>(
+      create: (_) => Auth(),
+      child: FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return MaterialApp(
+              home: Scaffold(
+                  appBar: AppBar(
+                title: Text("Flutter-App Error"),
+              )),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Landing();
+          }
           return MaterialApp(
             home: Scaffold(
-                appBar: AppBar(
-              title: Text("Flutter-App Error"),
-            )),
-          );
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          return AuthProvider(
-            auth: Auth(),
-            child: Landing(),
-          );
-        }
-        return MaterialApp(
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text("Flutter-App Loading"),
-              backgroundColor: Colors.brown,
+              appBar: AppBar(
+                title: Text("Flutter-App Loading"),
+                backgroundColor: Colors.brown,
+              ),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [CircularProgressIndicator()],
+              ),
             ),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [CircularProgressIndicator()],
-            ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
