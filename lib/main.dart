@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/landing.dart';
 import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/auth_provider.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -28,8 +29,9 @@ class MyApp extends StatelessWidget {
           );
         }
         if (snapshot.connectionState == ConnectionState.done) {
-          return Landing(
+          return AuthProvider(
             auth: Auth(),
+            child: Landing(),
           );
         }
         return MaterialApp(

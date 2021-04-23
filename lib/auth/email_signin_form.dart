@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/auth_provider.dart';
 
 class EmailSigninForm extends StatefulWidget {
-  const EmailSigninForm({Key key, this.auth}) : super(key: key);
-  final AuthBase auth;
-
   @override
   _EmailSigninFormState createState() => _EmailSigninFormState();
 }
@@ -22,10 +19,11 @@ class _EmailSigninFormState extends State<EmailSigninForm> {
       _isloading = true;
     });
     try {
+      final auth = AuthProvider.of(context);
       if (_isSignIn) {
-        await widget.auth.signInWithEmailAndPassword(_email, _password);
+        await auth.signInWithEmailAndPassword(_email, _password);
       } else {
-        await widget.auth.signUpWithEmailAndPassword(_email, _password);
+        await auth.signUpWithEmailAndPassword(_email, _password);
       }
       Navigator.of(context).pop();
     } catch (e) {

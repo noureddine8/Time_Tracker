@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/auth_provider.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key key, @required this.auth}) : super(key: key);
-  final AuthBase auth;
-
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
+    final auth = AuthProvider.of(context);
     try {
       await auth.signOut();
     } catch (e) {
@@ -30,7 +28,7 @@ class Home extends StatelessWidget {
               ],
             ));
     if (didRequestSignOut) {
-      _signOut();
+      _signOut(context);
     }
   }
 

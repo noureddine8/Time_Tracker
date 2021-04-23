@@ -1,16 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/home.dart';
-import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/auth_provider.dart';
 
 import 'auth/sign_in.dart';
 
 class Landing extends StatelessWidget {
-  const Landing({Key key, @required this.auth}) : super(key: key);
-  final AuthBase auth;
-
   @override
   Widget build(BuildContext context) {
+    final auth = AuthProvider.of(context);
     return StreamBuilder<User>(
       stream: auth.authStateChanges(),
       builder: (context, snapshot) {
@@ -22,9 +20,7 @@ class Landing extends StatelessWidget {
               theme: ThemeData(
                 primarySwatch: Colors.brown,
               ),
-              home: SignInPage(
-                auth: auth,
-              ),
+              home: SignInPage(),
               debugShowCheckedModeBanner: false,
             );
           } else {
@@ -33,9 +29,7 @@ class Landing extends StatelessWidget {
               theme: ThemeData(
                 primarySwatch: Colors.brown,
               ),
-              home: Home(
-                auth: auth,
-              ),
+              home: Home(),
               debugShowCheckedModeBanner: false,
             );
           }
