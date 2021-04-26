@@ -7,31 +7,47 @@ import 'package:provider/provider.dart';
 
 import 'customButton.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
+  @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  bool _isLoading = false;
+
   Future<void> _anonymousSignIn(BuildContext context) async {
     try {
+      toggleLoading();
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInAnonymously();
     } catch (e) {
       showExceptionAlertDialog(context, title: "Signin failded", exception: e);
+    } finally {
+      toggleLoading();
     }
   }
 
   Future<void> _googleSignIn(BuildContext context) async {
     try {
+      toggleLoading();
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithGoogle();
     } catch (e) {
       showExceptionAlertDialog(context, title: "Signin failded", exception: e);
+    } finally {
+      toggleLoading();
     }
   }
 
   Future<void> _facebookSignIn(BuildContext context) async {
     try {
+      toggleLoading();
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithFacebook();
     } catch (e) {
       showExceptionAlertDialog(context, title: "Signin failded", exception: e);
+    } finally {
+      toggleLoading();
     }
   }
 
@@ -55,15 +71,24 @@ class SignInPage extends StatelessWidget {
           elevation: 1,
         ),
         body: Container(
-          padding: EdgeInsets.fromLTRB(10, 250, 10, 0),
+          padding: EdgeInsets.fromLTRB(10, 100, 10, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Center(
+                child: Builder(builder: (context) {
+                  if (_isLoading) {
+                    return CircularProgressIndicator();
+                  }
+                  return Container();
+                }),
+              ),
+              SizedBox(height: 100),
               CustomButton(
                 color: Colors.brown,
                 text: "Sign in ",
-                onPress: () => onSigninClick(context),
+                onPress: _isLoading ? null : () => onSigninClick(context),
               ),
               SizedBox(height: 50),
               AuthButton(
@@ -72,7 +97,7 @@ class SignInPage extends StatelessWidget {
                 text: "Sign in with google",
                 textColor: Colors.black,
                 borderColor: Color(0XFFDB4437),
-                onPress: () => _googleSignIn(context),
+                onPress: _isLoading ? null : () => _googleSignIn(context),
               ),
               AuthButton(
                 color: Color(0xff3b5998),
@@ -80,7 +105,7 @@ class SignInPage extends StatelessWidget {
                 text: "Sign in with facebook",
                 textColor: Colors.white,
                 borderColor: Color(0xff3b5998),
-                onPress: () => _facebookSignIn(context),
+                onPress: _isLoading ? null : () => _facebookSignIn(context),
               ),
               Text(
                 "Or",
@@ -90,10 +115,16 @@ class SignInPage extends StatelessWidget {
               CustomButton(
                 color: Colors.grey,
                 text: "Go anonymous",
-                onPress: () => _anonymousSignIn(context),
+                onPress: _isLoading ? null : () => _anonymousSignIn(context),
               )
             ],
           ),
         ));
+  }
+
+  void toggleLoading() {
+    setState(() {
+      _isLoading = !_isLoading;
+    });
   }
 }
