@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/auth/authButton.dart';
 import 'package:flutter_app/auth/email_sign_in_page.dart';
+import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
 import 'package:flutter_app/services/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +13,7 @@ class SignInPage extends StatelessWidget {
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInAnonymously();
     } catch (e) {
-      print(e.toString());
+      showExceptionAlertDialog(context, title: "Signin failded", exception: e);
     }
   }
 
@@ -21,7 +22,7 @@ class SignInPage extends StatelessWidget {
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithGoogle();
     } catch (e) {
-      print(e.toString());
+      showExceptionAlertDialog(context, title: "Signin failded", exception: e);
     }
   }
 
@@ -30,7 +31,7 @@ class SignInPage extends StatelessWidget {
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithFacebook();
     } catch (e) {
-      print(e.toString());
+      showExceptionAlertDialog(context, title: "Signin failded", exception: e);
     }
   }
 
