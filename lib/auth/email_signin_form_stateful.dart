@@ -17,7 +17,7 @@ class _EmailSigninFormState extends State<EmailSigninForm> {
   String get _email => _emailController.text;
   String get _password => _passwordController.text;
 
-  void _submit() async {
+  Future<void> _submit() async {
     setState(() {
       _isloading = true;
     });
