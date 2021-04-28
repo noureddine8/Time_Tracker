@@ -74,7 +74,7 @@ class SignedIn extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.brown,
       ),
-      home: SignInPage(),
+      home: SignInPage.create(context),
       debugShowCheckedModeBanner: false,
     );
   }
