@@ -40,8 +40,8 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
 
   void _toggleFormType(EmailSigninModel model) {
     widget.bloc.updateWith(isSignIn: !model.isSignIn);
-    widget.bloc.updateWith(email: "");
-    widget.bloc.updateWith(password: "");
+    widget.bloc.updateEmail("");
+    widget.bloc.updatePassword("");
     _emailController.clear();
     _passwordController.clear();
   }
@@ -65,35 +65,27 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
   }
 
   List<Widget> _buildChildren(EmailSigninModel model) {
-    final buttonText = model.isSignIn ? "SIGN IN" : "SIGN UP";
-    final secondText = model.isSignIn
-        ? "Need an account? Register"
-        : "Already have an account? Sign in";
-    final bool isButtonEnabled =
-        !model.isloading && model.email.isNotEmpty && model.password.isNotEmpty;
+    final buttonText = model.buttonText;
+    final secondText = model.secondText;
+    final bool isButtonEnabled = model.isButtonEnabled;
 
     return [
       TextField(
-        controller: _emailController,
-        decoration: InputDecoration(
-            labelText: "Email",
-            hintText: "type your email",
-            enabled: !model.isloading),
-        keyboardType: TextInputType.emailAddress,
-        textInputAction: TextInputAction.next,
-        onChanged: (email) {
-          widget.bloc.updateWith(email: email);
-        },
-      ),
+          controller: _emailController,
+          decoration: InputDecoration(
+              labelText: "Email",
+              hintText: "type your email",
+              enabled: !model.isloading),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          onChanged: widget.bloc.updateEmail),
       TextField(
         controller: _passwordController,
         obscureText: true,
         decoration:
             InputDecoration(labelText: "Password", enabled: !model.isloading),
         textInputAction: TextInputAction.done,
-        onChanged: (password) {
-          widget.bloc.updateWith(password: password);
-        },
+        onChanged: widget.bloc.updatePassword,
       ),
       Container(
           margin: EdgeInsets.only(top: 10.0),

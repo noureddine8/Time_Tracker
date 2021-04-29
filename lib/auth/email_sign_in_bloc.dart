@@ -25,6 +25,9 @@ class EmailSignInBloc {
     _modelController.add(_model);
   }
 
+  void updateEmail(String email) => updateWith(email: email);
+  void updatePassword(String password) => updateWith(password: password);
+
   Future<void> submit() async {
     updateWith(isLoading: true);
     try {

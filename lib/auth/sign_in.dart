@@ -75,7 +75,7 @@ class SignInPage extends StatelessWidget {
 
   Container buildContainer(BuildContext context, bool isLoading) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 80, 10, 0),
+      padding: EdgeInsets.fromLTRB(10, 70, 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,

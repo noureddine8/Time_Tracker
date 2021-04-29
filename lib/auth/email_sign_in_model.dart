@@ -10,6 +10,20 @@ class EmailSigninModel {
       this.isSignIn = true,
       this.isloading = false});
 
+  String get buttonText {
+    return isSignIn ? "SIGN IN" : "SIGN UP";
+  }
+
+  String get secondText {
+    return isSignIn
+        ? "Need an account? Register"
+        : "Already have an account? Sign in";
+  }
+
+  bool get isButtonEnabled {
+    return !isloading && email.isNotEmpty && password.isNotEmpty;
+  }
+
   EmailSigninModel copyWith(
       {String email, String password, bool isLoading, bool isSignIn}) {
     return EmailSigninModel(
