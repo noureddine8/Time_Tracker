@@ -2,23 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/auth/authButton.dart';
 import 'package:flutter_app/auth/email_sign_in_page.dart';
 import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
-import 'package:flutter_app/auth/sign_in_bloc.dart';
+import 'package:flutter_app/auth/sign_in_manager.dart';
 import 'package:flutter_app/services/auth.dart';
 import 'package:provider/provider.dart';
 
 import 'customButton.dart';
 
 class SignInPage extends StatelessWidget {
-  final SignInBloc bloc;
+  final SignInManager bloc;
+  final bool isLoading;
 
-  const SignInPage({Key key, @required this.bloc}) : super(key: key);
+  const SignInPage({Key key, @required this.bloc, @required this.isLoading})
+      : super(key: key);
+
   static Widget create(BuildContext context) {
     final auth = Provider.of<AuthBase>(context, listen: false);
-    return Provider<SignInBloc>(
-        create: (_) => SignInBloc(auth: auth),
-        dispose: (_, bloc) => bloc.dispose(),
-        child: Consumer<SignInBloc>(
-            builder: (_, bloc, __) => SignInPage(bloc: bloc)));
+
+    return ChangeNotifierProvider<ValueNotifier<bool>>(
+      create: (_) => ValueNotifier<bool>(false),
+      child: Consumer<ValueNotifier<bool>>(
+          builder: (_, isLoading, __) => Provider<SignInManager>(
+              create: (_) => SignInManager(auth: auth, isLoading: isLoading),
+              child: Consumer<SignInManager>(
+                  builder: (_, bloc, __) =>
+                      SignInPage(bloc: bloc, isLoading: isLoading.value)))),
+    );
   }
 
   Future<void> _anonymousSignIn(BuildContext context) async {
@@ -64,16 +72,10 @@ class SignInPage extends StatelessWidget {
           centerTitle: true,
           elevation: 5,
         ),
-        body: StreamBuilder<bool>(
-          stream: bloc.isLoadingStream,
-          initialData: false,
-          builder: (context, snapshot) {
-            return buildContainer(context, snapshot.data);
-          },
-        ));
+        body: buildContainer(context));
   }
 
-  Container buildContainer(BuildContext context, bool isLoading) {
+  Container buildContainer(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(10, 70, 10, 0),
       child: Column(
