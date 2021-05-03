@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/home.dart';
+import 'package:flutter_app/home/Jobs.dart';
 import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/database.dart';
 import 'package:provider/provider.dart';
 
 import 'auth/sign_in.dart';
@@ -18,7 +19,9 @@ class Landing extends StatelessWidget {
           if (user == null) {
             return SignedIn();
           } else {
-            return HomePage();
+            return HomePage(
+              user: user,
+            );
           }
         }
         return Loading();
@@ -28,19 +31,24 @@ class Landing extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
+  final User user;
   const HomePage({
     Key key,
+    @required this.user,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Time Tracker",
-      theme: ThemeData(
-        primarySwatch: Colors.brown,
+    return Provider<Database>(
+      create: (_) => FirestoreDatabase(uid: user.uid),
+      child: MaterialApp(
+        title: "Time Tracker",
+        theme: ThemeData(
+          primarySwatch: Colors.brown,
+        ),
+        home: Jobs(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: Home(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

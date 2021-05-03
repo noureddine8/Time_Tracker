@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
+import 'package:flutter_app/home/models/job.dart';
 import 'package:flutter_app/services/auth.dart';
+import 'package:flutter_app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
+class Jobs extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     final auth = Provider.of<AuthBase>(context, listen: false);
     try {
@@ -37,7 +41,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home Page"),
+        title: Text("Jobs Page"),
         centerTitle: true,
         actions: [
           TextButton(
@@ -51,6 +55,35 @@ class Home extends StatelessWidget {
               ))
         ],
       ),
+      body: _buildContents(context),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add), onPressed: () => _createJob(context)),
     );
+  }
+
+  Future<void> _createJob(BuildContext context) async {
+    final Database database = Provider.of<Database>(context, listen: false);
+    try {
+      await database.createJob(Job(name: "Gaming", ratePerHour: 8));
+    } on FirebaseException catch (e) {
+      showExceptionAlertDialog(context,
+          title: "Operation failed", exception: e);
+    }
+  }
+
+  Widget _buildContents(BuildContext context) {
+    final Database database = Provider.of<Database>(context);
+    return StreamBuilder<List<Job>>(
+        stream: database.jobsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final jobs = snapshot.data;
+            final children = jobs.map((job) => Text(job.name)).toList();
+            return ListView(children: children);
+          } else if (snapshot.hasError) {
+            return Center(child: Text("An error occured"));
+          }
+          return Center(child: CircularProgressIndicator());
+        });
   }
 }
