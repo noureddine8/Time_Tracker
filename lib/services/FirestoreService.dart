@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class FirestoreService {
+  FirestoreService._();
+  static final instance = FirestoreService._();
+
   Future<void> setData({String path, Map<String, dynamic> data}) async {
     final DocumentReference ref = FirebaseFirestore.instance.doc(path);
     await ref.set(data);

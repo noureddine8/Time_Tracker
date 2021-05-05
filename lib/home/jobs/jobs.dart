@@ -1,6 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
+import 'package:flutter_app/home/jobs/add_job.dart';
 import 'package:flutter_app/home/models/job.dart';
 import 'package:flutter_app/services/auth.dart';
 import 'package:flutter_app/services/database.dart';
@@ -57,18 +56,8 @@ class Jobs extends StatelessWidget {
       ),
       body: _buildContents(context),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () => _createJob(context)),
+          child: Icon(Icons.add), onPressed: () => AddJob.show(context)),
     );
-  }
-
-  Future<void> _createJob(BuildContext context) async {
-    final Database database = Provider.of<Database>(context, listen: false);
-    try {
-      await database.createJob(Job(name: "Gaming", ratePerHour: 8));
-    } on FirebaseException catch (e) {
-      showExceptionAlertDialog(context,
-          title: "Operation failed", exception: e);
-    }
   }
 
   Widget _buildContents(BuildContext context) {
@@ -79,7 +68,17 @@ class Jobs extends StatelessWidget {
           if (snapshot.hasData) {
             final jobs = snapshot.data;
             final children = jobs.map((job) => Text(job.name)).toList();
-            return ListView(children: children);
+            return children.length == 0
+                ? Center(
+                    child: Text(
+                      "No jobs yet",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : ListView(children: children);
           } else if (snapshot.hasError) {
             return Center(child: Text("An error occured"));
           }
