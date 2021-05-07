@@ -1,9 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
+import 'package:flutter_app/home/models/job.dart';
+import 'package:flutter_app/services/database.dart';
+import 'package:provider/provider.dart';
 
 class AddJob extends StatefulWidget {
+  final Database database;
+
+  const AddJob({Key key, @required this.database}) : super(key: key);
   static Future<void> show(BuildContext context) async {
-    await Navigator.push(context,
-        MaterialPageRoute(builder: (_) => AddJob(), fullscreenDialog: true));
+    final Database database = Provider.of<Database>(context, listen: false);
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => AddJob(
+                  database: database,
+                ),
+            fullscreenDialog: true));
   }
 
   @override
@@ -25,9 +39,16 @@ class _AddJobState extends State<AddJob> {
     return false;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_validateAndSaveForm()) {
-      print("saved, name : $_jobName and rate : $_ratePerHour");
+      try {
+        final Job job = Job(name: _jobName, ratePerHour: _ratePerHour);
+        await widget.database.createJob(job);
+        Navigator.pop(context);
+      } on FirebaseException catch (e) {
+        showExceptionAlertDialog(context,
+            title: "Operation Failed", exception: e);
+      }
     }
   }
 
@@ -38,12 +59,14 @@ class _AddJobState extends State<AddJob> {
         elevation: 10.0,
         title: Text("Add new job"),
         actions: [
-          TextButton(
-              onPressed: _submit,
-              child: Text(
-                "Save",
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ))
+          ElevatedButton(
+            onPressed: _submit,
+            child: Text(
+              "Save",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            style: ElevatedButton.styleFrom(elevation: 50),
+          )
         ],
       ),
       body: buildBuildContents(),
