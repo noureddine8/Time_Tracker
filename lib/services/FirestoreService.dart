@@ -11,11 +11,13 @@ class FirestoreService {
   }
 
   Stream<List<T>> collectionStream<T>(
-      {@required String path,
-      @required T Function(Map<String, dynamic> data) builder}) {
+      {@required
+          String path,
+      @required
+          T Function(Map<String, dynamic> data, String documentId) builder}) {
     final ref = FirebaseFirestore.instance.collection(path);
     final snapshots = ref.snapshots();
-    return snapshots.map(
-        (snapshot) => snapshot.docs.map((e) => builder(e.data())).toList());
+    return snapshots.map((snapshot) =>
+        snapshot.docs.map((e) => builder(e.data(), e.id)).toList());
   }
 }

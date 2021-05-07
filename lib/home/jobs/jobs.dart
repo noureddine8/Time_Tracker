@@ -67,7 +67,17 @@ class Jobs extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final jobs = snapshot.data;
-            final children = jobs.map((job) => Text(job.name)).toList();
+            final children = jobs
+                .map(
+                  (job) => ListTile(
+                    onTap: () => AddJob.show(context, jobToEdit: job),
+                    trailing: Icon(Icons.chevron_right),
+                    leading: Icon(Icons.work),
+                    title: Text(job.name),
+                    subtitle: Text(job.ratePerHour.toString()),
+                  ),
+                )
+                .toList();
             return children.length == 0
                 ? Center(
                     child: Text(

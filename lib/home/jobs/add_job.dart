@@ -7,14 +7,17 @@ import 'package:provider/provider.dart';
 
 class AddJob extends StatefulWidget {
   final Database database;
+  final Job jobToEdit;
 
-  const AddJob({Key key, @required this.database}) : super(key: key);
-  static Future<void> show(BuildContext context) async {
+  const AddJob({Key key, @required this.database, this.jobToEdit})
+      : super(key: key);
+  static Future<void> show(BuildContext context, {Job jobToEdit}) async {
     final Database database = Provider.of<Database>(context, listen: false);
     await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (_) => AddJob(
+                  jobToEdit: jobToEdit,
                   database: database,
                 ),
             fullscreenDialog: true));
@@ -26,6 +29,15 @@ class AddJob extends StatefulWidget {
 
 class _AddJobState extends State<AddJob> {
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.jobToEdit != null) {
+      _jobName = widget.jobToEdit.name;
+      _ratePerHour = widget.jobToEdit.ratePerHour;
+    }
+  }
 
   String _jobName;
   int _ratePerHour;
@@ -42,8 +54,10 @@ class _AddJobState extends State<AddJob> {
   Future<void> _submit() async {
     if (_validateAndSaveForm()) {
       try {
-        final Job job = Job(name: _jobName, ratePerHour: _ratePerHour);
-        await widget.database.createJob(job);
+        final bool isEdit = widget.jobToEdit == null ? false : true;
+        final id = widget.jobToEdit?.id ?? DateTime.now().toIso8601String();
+        final Job job = Job(id: id, name: _jobName, ratePerHour: _ratePerHour);
+        await widget.database.setJob(job, isEdit);
         Navigator.pop(context);
       } on FirebaseException catch (e) {
         showExceptionAlertDialog(context,
@@ -57,7 +71,7 @@ class _AddJobState extends State<AddJob> {
     return Scaffold(
       appBar: AppBar(
         elevation: 10.0,
-        title: Text("Add new job"),
+        title: Text(widget.jobToEdit == null ? "Add new job" : "Edit job"),
         actions: [
           ElevatedButton(
             onPressed: _submit,
@@ -97,11 +111,13 @@ class _AddJobState extends State<AddJob> {
   List<Widget> _buildFormChildren() {
     return [
       TextFormField(
+        initialValue: _jobName,
         decoration: InputDecoration(labelText: "Job Name"),
         onSaved: (value) => _jobName = value,
         validator: (value) => value.isEmpty ? "Name can't be empty" : null,
       ),
       TextFormField(
+        initialValue: _ratePerHour != null ? _ratePerHour.toString() : null,
         decoration: InputDecoration(labelText: "Rate Per Hour"),
         keyboardType:
             TextInputType.numberWithOptions(decimal: false, signed: false),
