@@ -7,6 +7,7 @@ import 'package:flutter_app/services/FirestoreService.dart';
 
 abstract class Database {
   Future<void> setJob(Job job, bool isEdit);
+  Future<void> deleteJob(Job job);
   Stream<List<Job>> jobsStream();
 }
 
@@ -37,4 +38,8 @@ class FirestoreDatabase implements Database {
     return _service.setData(
         data: jobData.toMap(), path: APIPath.job(uid, jobData.id));
   }
+
+  @override
+  Future<void> deleteJob(Job job) =>
+      _service.deleteData(path: APIPath.job(uid, job.id));
 }

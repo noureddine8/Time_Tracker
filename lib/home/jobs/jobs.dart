@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/auth/show_exception_alert_dialog.dart';
 import 'package:flutter_app/home/jobs/add_job.dart';
 import 'package:flutter_app/home/models/job.dart';
 import 'package:flutter_app/services/auth.dart';
@@ -36,6 +38,16 @@ class Jobs extends StatelessWidget {
     }
   }
 
+  Future<void> _delete(BuildContext context, Job job) async {
+    final database = Provider.of<Database>(context, listen: false);
+    try {
+      await database.deleteJob(job);
+    } on FirebaseException catch (e) {
+      showExceptionAlertDialog(context,
+          title: "Operation failed", exception: e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,28 +79,50 @@ class Jobs extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final jobs = snapshot.data;
-            final children = jobs
-                .map(
-                  (job) => ListTile(
-                    onTap: () => AddJob.show(context, jobToEdit: job),
-                    trailing: Icon(Icons.chevron_right),
-                    leading: Icon(Icons.work),
-                    title: Text(job.name),
-                    subtitle: Text(job.ratePerHour.toString()),
-                  ),
-                )
-                .toList();
-            return children.length == 0
+
+            return jobs.isEmpty
                 ? Center(
-                    child: Text(
-                      "No jobs yet",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "No jobs yet",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text("Add a new job by clicking the button below"),
+                      ],
                     ),
                   )
-                : ListView(children: children);
+                : ListView.separated(
+                    separatorBuilder: (_, __) => Divider(
+                      height: 1,
+                    ),
+                    itemCount: jobs.length + 2,
+                    itemBuilder: (context, index) {
+                      if (index == 0 || index == jobs.length + 1)
+                        return Container();
+                      return Dismissible(
+                        background: Container(
+                          color: Colors.red,
+                        ),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (_) => _delete(context, jobs[index - 1]),
+                        key: UniqueKey(),
+                        child: ListTile(
+                          onTap: () =>
+                              AddJob.show(context, jobToEdit: jobs[index - 1]),
+                          trailing: Icon(Icons.chevron_right),
+                          leading: Icon(Icons.work),
+                          title: Text(jobs[index - 1].name),
+                          subtitle:
+                              Text(jobs[index - 1].ratePerHour.toString()),
+                        ),
+                      );
+                    },
+                  );
           } else if (snapshot.hasError) {
             return Center(child: Text("An error occured"));
           }
